@@ -330,6 +330,6 @@ setInterval(()=>{
   console.log("private_room", private_rooms )
 },15000)
 
-server.listen(port, () => {
+server.listen(process.env.PORT || port, () => {
   console.log('listening on *:' + port);
 });
