@@ -342,12 +342,29 @@ const socket = require('socket.io');
 const { handleConnection } = require('./socketHandlers');
 const RoomManager = require('./roomManager'); // Import the RoomManager
 const express = require('express');
-
+const bodyParser = require('body-parser');
 const app = express();
 const server = http.createServer(app);
 const serverhttps = https.createServer(app);
+require('dotenv').config()
+const mongoose = require('mongoose');
+const AppModel = require('./Models/AppModal');
+app.use(bodyParser.json());
+var morgan = require('morgan')
+ 
+app.use(morgan('combined'))
 
-const PORT = process.env.PORT || 5000;
+mongoose.connect(
+    process.env.DB_LINK 
+    , {useNewUrlParser: true, useUnifiedTopology: true}
+    
+).then(()=>{
+    console.log("database connected")
+}).catch((error)=>{
+    console.log(error)
+});
+
+const PORT = process.env.PORT;
 
 var io = socket(server, {
     pingInterval: 10000,
@@ -356,6 +373,58 @@ var io = socket(server, {
     // wsEngine: "uws" 
 });
 
+app.get('/check_update', async (req, res) => {
+    const { app_name } = req.query;
+  
+    try {
+      const app = await AppModel.findOne({ app_name });
+  
+      if (!app) {
+        return res.status(404).json({ error: 'App not found' });
+      }
+  
+      res.status(200).json({ app });
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching app details', details: error });
+    }
+  });
+app.post('/update_app', async (req, res) => {
+    const { app_name, android_version, ios } = req.body;
+
+    try {
+        const updatedApp = await AppModel.findOneAndUpdate(
+        { app_name }, // Find the app by name
+        { android_version, ios }, // Fields to update
+        { new: true } // Return the updated document
+        );
+
+        if (!updatedApp) {
+        return res.status(404).json({ error: 'App not found' });
+        }
+
+        res.status(200).json({ message: 'App updated successfully', app: updatedApp });
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating the app', details: error });
+    }
+});
+
+app.post('/create_app', async (req, res) => {
+    const { app_name, android_version, ios } = req.body;
+  
+    try {
+      const newApp = new AppModel({
+        app_name,
+        android_version,
+        ios
+      });
+      
+      const savedApp = await newApp.save();
+      res.status(201).json({ message: 'App created successfully', app: savedApp });
+    } catch (error) {
+      res.status(500).json({ error: 'Error creating the app', details: error });
+    }
+});
+  
 app.get('/', (req, res) => {
     res.send("Server is running.");
 });
@@ -368,7 +437,7 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(process.env.PORT || PORT, () => {
+server.listen(PORT, () => {
     console.log('Server is listening on port ' + PORT);
 });
 // serverhttps.listen(process.env.PORT || PORT+1, () => {
