@@ -1,9 +1,11 @@
 class Room {
-    constructor(room_name, firstPlayer) {
+    constructor(room_name, firstPlayer, gridType = '3x3') {
         this.room_name = room_name;
         this.player_1 = firstPlayer;
         this.player_2 = null;
         this.isReady = false; // Flag to check if both players are present
+        this.gridType = gridType;
+
     }
 
     addPlayer(player) {

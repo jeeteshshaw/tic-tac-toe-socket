@@ -340,15 +340,22 @@ const http = require('http');
 const socket = require('socket.io');
 const { handleConnection } = require('./socketHandlers');
 const RoomManager = require('./roomManager'); // Import the RoomManager
+const express = require('express');
 
-const server = http.createServer();
-const port = 5000;
+const app = express();
+const server = http.createServer(app);
+
+const PORT = process.env.PORT || 5000;
 
 var io = socket(server, {
     pingInterval: 10000,
     pingTimeout: 5000,
     allowEIO3:true,
     // wsEngine: "uws" 
+});
+
+app.get('/', (req, res) => {
+    res.send("Server is running.");
 });
 
 // Create an instance of RoomManager and pass it to socket event handlers
@@ -359,9 +366,10 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(process.env.PORT || port, () => {
-    console.log('Server is listening on port ' + port);
+server.listen(process.env.PORT || PORT, () => {
+    console.log('Server is listening on port ' + PORT);
 });
+
 
 // setInterval(() => {
     
