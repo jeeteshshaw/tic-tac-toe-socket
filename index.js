@@ -336,7 +336,7 @@
 
 'use strict';
 
-const http = require('http');
+const http = require('https');
 const socket = require('socket.io');
 const { handleConnection } = require('./socketHandlers');
 const RoomManager = require('./roomManager'); // Import the RoomManager
