@@ -336,7 +336,8 @@
 
 'use strict';
 
-const http = require('https');
+const https = require('https');
+const http = require('http');
 const socket = require('socket.io');
 const { handleConnection } = require('./socketHandlers');
 const RoomManager = require('./roomManager'); // Import the RoomManager
@@ -344,6 +345,7 @@ const express = require('express');
 
 const app = express();
 const server = http.createServer(app);
+const serverhttps = https.createServer(app);
 
 const PORT = process.env.PORT || 5000;
 
@@ -366,9 +368,12 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(process.env.PORT || PORT,'0.0.0.0', () => {
+server.listen(process.env.PORT || PORT, () => {
     console.log('Server is listening on port ' + PORT);
 });
+// serverhttps.listen(process.env.PORT || PORT+1, () => {
+//     console.log('Server is listening on port ' + (PORT+1));
+// });
 
 
 // setInterval(() => {
