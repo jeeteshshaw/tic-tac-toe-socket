@@ -336,7 +336,7 @@
 
 'use strict';
 
-const http = require('https');
+const http = require('http');
 const socket = require('socket.io');
 const { handleConnection } = require('./socketHandlers');
 const RoomManager = require('./roomManager'); // Import the RoomManager
@@ -345,7 +345,7 @@ const express = require('express');
 const app = express();
 const server = http.createServer(app);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 80;
 
 var io = socket(server, {
     pingInterval: 10000,
