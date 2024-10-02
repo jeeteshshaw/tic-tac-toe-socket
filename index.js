@@ -350,8 +350,8 @@ const serverhttps = https.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 var io = socket(server, {
-    pingInterval: 10000,
-    pingTimeout: 5000,
+    pingInterval: 30000,
+    pingTimeout: 25000,
     allowEIO3:true,
     // wsEngine: "uws" 
 });
