@@ -366,7 +366,7 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(process.env.PORT || PORT, () => {
+server.listen(process.env.PORT || PORT,'0.0.0.0', () => {
     console.log('Server is listening on port ' + PORT);
 });
 
