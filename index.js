@@ -445,7 +445,7 @@ server.listen(PORT, () => {
 // });
 
 
-setInterval(() => {
+// setInterval(() => {
     
-    console.log(roomManager.privateRooms, roomManager.publicRooms);
-}, 15000*2);
+//     console.log(roomManager.privateRooms, roomManager.publicRooms);
+// }, 15000*2);
