@@ -1,77 +1,75 @@
 class Room {
-    constructor(room_name, firstPlayer, gridType = '3x3') {
-        this.room_name = room_name;
-        this.player_1 = firstPlayer;
+    constructor(roomName, player_1, gridType) {
+        this.room_name = roomName;
+        this.player_1 = player_1;
         this.player_2 = null;
-        this.isReady = false; // Flag to check if both players are present
-        this.gridType = gridType;
-
-    }
-
-    addPlayer(player) {
-        if (this.player_2 === null) {
-            this.player_2 = player;
-            this.isReady = true;  // Mark the room as ready when second player joins
-        }
+        this.gridType = gridType; // 3x3 or 4x4
     }
 
     isFull() {
-        return this.player_2 !== null;
+        return this.player_1 && this.player_2;
+    }
+
+    addPlayer(playerId) {
+        if (!this.player_2) {
+            this.player_2 = playerId;
+        }
     }
 
     isMatchReady() {
-        return this.isReady;
+        return this.player_1 && this.player_2;
     }
 }
 
 class RoomManager {
     constructor() {
-        this.public_rooms = [];
-        this.private_rooms = [];
+        this.publicRooms = [];
+        this.privateRooms = [];
     }
 
-    // Public Room Methods
-    createPublicRoom(firstPlayer) {
-        const room = new Room(`room_${Math.random()}`, firstPlayer);
-        this.public_rooms.push(room);
+    // Find available public room based on gridType (3x3 or 4x4)
+    findAvailablePublicRoom(gridType) {
+        return this.publicRooms.find(room => !room.isFull() && room.gridType === gridType);
+    }
+
+    // Create a public room with the provided gridType
+    createPublicRoom(playerId, gridType) {
+        const roomName = `public_room_${this.publicRooms.length + 1}`;
+        const room = new Room(roomName, playerId, gridType);
+        this.publicRooms.push(room);
         return room;
     }
 
-    findAvailablePublicRoom() {
-        return this.public_rooms.find(room => room.player_2 === null);
+    // Find public room by player
+    findPublicRoomByPlayer(playerId) {
+        return this.publicRooms.find(room => room.player_1 === playerId || room.player_2 === playerId);
     }
 
-    findPublicRoomByPlayer(socketId) {
-        return this.public_rooms.find(room => room.player_1 === socketId || room.player_2 === socketId);
-    }
-
+    // Remove public room by socket
     removePublicRoomBySocket(socketId) {
-        const index = this.public_rooms.findIndex(room => room.player_1 === socketId || room.player_2 === socketId);
-        if (index >= 0) {
-            this.public_rooms.splice(index, 1);
-        }
+        this.publicRooms = this.publicRooms.filter(room => room.player_1 !== socketId && room.player_2 !== socketId);
     }
 
-    // Private Room Methods
-    createPrivateRoom(roomName, firstPlayer) {
-        const room = new Room(roomName, firstPlayer);
-        this.private_rooms.push(room);
+    // Find a private room
+    findPrivateRoom(roomName) {
+        return this.privateRooms.find(room => room.room_name === roomName);
+    }
+
+    // Create a private room with gridType
+    createPrivateRoom(roomName, playerId, gridType) {
+        const room = new Room(roomName, playerId, gridType);
+        this.privateRooms.push(room);
         return room;
     }
 
-    findPrivateRoom(roomName) {
-        return this.private_rooms.find(room => room.room_name === roomName);
+    // Find private room by player
+    findPrivateRoomByPlayer(playerId) {
+        return this.privateRooms.find(room => room.player_1 === playerId || room.player_2 === playerId);
     }
 
-    findPrivateRoomByPlayer(socketId) {
-        return this.private_rooms.find(room => room.player_1 === socketId || room.player_2 === socketId);
-    }
-
+    // Remove private room by socket
     removePrivateRoomBySocket(socketId) {
-        const index = this.private_rooms.findIndex(room => room.player_1 === socketId || room.player_2 === socketId);
-        if (index >= 0) {
-            this.private_rooms.splice(index, 1);
-        }
+        this.privateRooms = this.privateRooms.filter(room => room.player_1 !== socketId && room.player_2 !== socketId);
     }
 }
 
